@@ -1,35 +1,39 @@
-let input = document.getElementById('inputBox');
-let buttons = document.querySelectorAll('button');
+const display = document.getElementById('result');
 
+function append(value) {
+  if (display.value === '0' || display.value === 'Error') {
+    display.value = (value === '.') ? '0.' : value;
+  } else {
+    display.value += value;
+  }
+}
 
-let arr = [...buttons];
-let string = "";
+function clearResult() {
+  display.value = '0';
+}
 
+function deleteLast() {
+  display.value = display.value.length > 1 ? display.value.slice(0, -1) : '0';
+}
 
-arr.forEach(button => {
-    button.addEventListener('click', (e) => {
-        
-        let buttonText = e.target.innerHTML;
+function calculate() {
+  try {
+    let expression = display.value.replace(/×/g, '*');
+    let result = eval(expression);
+    display.value = isFinite(result) ? Number(result.toFixed(10)) : 'Error';
+  } catch {
+    display.value = 'Error';
+    setTimeout(() => display.value = '0', 1200);
+  }
+}
 
-        if (buttonText === '=') {
-            
-            string = eval(string);
-            input.value = string; 
-
-        } else if (buttonText === 'AC') {
-            
-            string = "";
-            input.value = string;
-
-        } else if (buttonText === 'DEL') {
-            
-            string = string.substring(0, string.length - 1);
-            input.value = string;
-            
-        } else {
-            
-            string += buttonText;
-            input.value = string;
-        }
-    });
+document.addEventListener('keydown', e => {
+  if (e.key >= '0' && e.key <= '9') append(e.key);
+  if (e.key === '.') append('.');
+  if (e.key === '+' || e.key === '-') append(e.key);
+  if (e.key === '*') append('×');
+  if (e.key === '/') append('/');
+  if (e.key === 'Enter' || e.key === '=') calculate();
+  if (e.key === 'Backspace') deleteLast();
+  if (e.key === 'Escape') clearResult();
 });
